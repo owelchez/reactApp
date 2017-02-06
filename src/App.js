@@ -2,13 +2,11 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import { TodoForm, TodoList } from './components/todo';
-import {addTodo, generateId} from './lib/todoHelpers'
+import {addTodo, generateId, findById, toggleTodo, updateTodo} from './lib/todoHelpers'
 
 
 class App extends Component {
-  constructor(){
-    super()
-    this.state = {
+  state = {
       todos: [
         {id: 1, name: 'Learn JSX', isComplete: true},
         {id: 2, name: 'Build an Awesome App', isComplete: false},
@@ -16,12 +14,15 @@ class App extends Component {
       ],
       currentTodo: ''
     }
-    this.handleInputChange = this.handleInputChange.bind(this)
-    this.handleSubmit = this.handleSubmit.bind(this)
-    this.handleEmptySubmit = this.handleEmptySubmit.bind(this)
-  }
 
-  handleSubmit(evt) {
+    handleToggle = (id) => {
+      const todo = findById(id, this.state.todos)
+      const toggled = toggleTodo(todo)
+      const updatedTodos = updateTodo(this.state.todos, toggled)
+      this.setState({todos: updatedTodos})
+    }
+
+  handleSubmit = (evt) => {
     evt.preventDefault()
     const newId = generateId()
     const newTodo = {id: newId, name: this.state.currentTodo, isComplete: false}
@@ -33,14 +34,14 @@ class App extends Component {
     })
   }
 
-  handleEmptySubmit(evt) {
+  handleEmptySubmit = (evt) => {
     evt.preventDefault()
     this.setState({
       errorMessage: 'Please supply a todo name'
     })
   }
 
-  handleInputChange(evt){
+  handleInputChange = (evt) => {
     this.setState({
       currentTodo: evt.target.value
     })
@@ -58,8 +59,8 @@ class App extends Component {
           {this.state.errorMessage && <span className='error'>{this.state.errorMessage}</span>}
             <TodoForm handleInputChange={this.handleInputChange} currentTodo={this.state.currentTodo}
               handleSubmit={submitHandler}/>
-              <TodoList todos={this.state.todos}/>
-          }
+              <TodoList handleToggle={this.handleToggle} todos={this.state.todos}/>
+          
               
           </div>
         
